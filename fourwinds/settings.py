@@ -10,7 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os, dj_database_url
+import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +40,20 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'website.apps.WebsiteConfig',
-    'storages'
+    'storages',
+    # Blog
+    'django.contrib.sites',
+    "django.contrib.redirects",
+    "django.contrib.sitemaps",
+    "mezzanine.boot",
+    "mezzanine.conf",
+    "mezzanine.core",
+    # "mezzanine.generic",
+    "mezzanine.pages",
+    "mezzanine.blog",
+    "mezzanine.forms",
+    "mezzanine.galleries",
+    "mezzanine.twitter",
 
 ]
 
@@ -53,6 +67,15 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    # BLOG
+    "mezzanine.core.request.CurrentRequestMiddleware",
+    "mezzanine.core.middleware.RedirectFallbackMiddleware",
+    "mezzanine.core.middleware.TemplateForDeviceMiddleware",
+    "mezzanine.core.middleware.TemplateForHostMiddleware",
+    "mezzanine.core.middleware.AdminLoginInterfaceSelectorMiddleware",
+    "mezzanine.core.middleware.SitePermissionMiddleware",
+    "mezzanine.pages.middleware.PageMiddleware",
+    "mezzanine.core.middleware.FetchFromCacheMiddleware",
 ]
 
 ROOT_URLCONF = 'fourwinds.urls'
@@ -69,6 +92,13 @@ TEMPLATES = [
 
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # Blog
+                "mezzanine.conf.context_processors.settings",
+                "mezzanine.pages.context_processors.page",
+            ],
+            # Blog
+            "builtins": [
+                "mezzanine.template.loader_tags",
             ],
         },
     },
@@ -138,3 +168,26 @@ DEFAULT_FILE_STORAGE = 'fourwinds.custom_storages.MediaStorage'
 STATICFILES_DIRS = (
     os.path.join(os.path.dirname(BASE_DIR), 'static'),
 )
+
+
+#BLOG
+ALL_EMAILS = []
+PACKAGE_NAME_FILEBROWSER = "filebrowser_safe"
+PACKAGE_NAME_GRAPPELLI = "grappelli_safe"
+GRAPPELLI_INSTALLED = False
+ADMIN_REMOVAL = []
+RATINGS_RANGE = range(1, 5)
+TESTING = False
+BLOG_SLUG = 'blog'
+COMMENTS_UNAPPROVED_VISIBLE = True
+COMMENTS_REMOVED_VISIBLE = False
+COMMENTS_DEFAULT_APPROVED = True
+COMMENTS_NOTIFICATION_EMAILS = ",".join(ALL_EMAILS)
+COMMENT_FILTER = None
+
+try:
+    from mezzanine.utils.conf import set_dynamic_settings
+except ImportError:
+    pass
+else:
+    set_dynamic_settings(globals())
